@@ -476,6 +476,77 @@ def create_natural_image(filenames, delay=0*pq.ms, duration=0*pq.ms):
     return evaluate
 
 
+def create_array_image(arrays, delay=0*pq.ms, duration=0*pq.ms):
+    """
+    Creates an image stimulus from an array
+
+    Parameters
+    ----------
+    arrays : list/ndarray
+        Image array(s)
+    delay : quantity scalar
+        Onset time
+    duration : quantity scalar
+
+    Returns
+    -------
+    out : callable
+        Evaluate function
+    """
+        
+    if arrays.ndim not in [2, 3]:
+        raise ValueError("array must be 2D or 3D")
+
+    if arrays.ndim > 3:
+        raise NotImplementedError("arrays must represent static images")
+
+    if isinstance(arrays, np.ndarray):
+        arrays = [arrays]
+
+    if delay < 0:
+        raise ValueError("delay must be a postive number: ".format(delay))
+
+    if duration < 0:
+        raise ValueError("duration must be a postive number: ".format(duration))
+
+    delay = delay if isinstance(delay, pq.Quantity) else delay * pq.ms
+    duration = duration if isinstance(duration, pq.Quantity) else duration * pq.ms
+
+    def evaluate(t, x, y):
+        # TODO: fix normalization
+        """
+        converts image to numpy array
+
+        Parameters
+        ----------
+        t : quantity scalar
+        x : quantity scalar
+        y : quantity scalar
+
+        Returns
+        -------
+        out : ndarray
+            Calculated values
+        """
+
+        Nt = t.shape[0]
+        Nx = x.shape[2]
+        Ny = y.shape[1]
+        stim = np.zeros([Nt, Nx, Ny])
+
+        for i, array in enumerate(arrays):
+            t_start = delay + i * (delay + duration)
+            t_stop = (i+1) * (duration + delay)
+            stim += array * (heaviside(t - t_start) - heaviside(t - t_stop))
+
+        if stim.max() - stim.min() != 0:
+            stim = 2 * ((stim - stim.min()) / (stim.max() - stim.min())) - 1
+            
+        return stim
+
+    return evaluate
+
+
 def create_natural_movie(filename):
     """
     Creates natural movie stimulus
