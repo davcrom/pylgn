@@ -537,9 +537,6 @@ def create_array_image(arrays, delay=0*pq.ms, duration=0*pq.ms):
             t_start = delay + i * (delay + duration)
             t_stop = (i+1) * (duration + delay)
             stim += array * (heaviside(t - t_start) - heaviside(t - t_stop))
-
-        if stim.max() - stim.min() != 0:
-            stim = 2 * ((stim - stim.min()) / (stim.max() - stim.min())) - 1
             
         return stim
 
