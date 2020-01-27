@@ -482,7 +482,7 @@ def create_array_image(arrays, delay=0*pq.ms, duration=0*pq.ms):
 
     Parameters
     ----------
-    arrays : list/ndarray
+    arrays : ndarray
         Image array(s)
     delay : quantity scalar
         Onset time
@@ -512,9 +512,9 @@ def create_array_image(arrays, delay=0*pq.ms, duration=0*pq.ms):
     duration = duration if isinstance(duration, pq.Quantity) else duration * pq.ms
 
     def evaluate(t, x, y):
-        # TODO: fix normalization
         """
-        converts image to numpy array
+        gives elements of 3D numpy array (along first dimension) delays and
+        durations
 
         Parameters
         ----------
