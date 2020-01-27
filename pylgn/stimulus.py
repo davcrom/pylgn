@@ -493,15 +493,14 @@ def create_array_image(arrays, delay=0*pq.ms, duration=0*pq.ms):
     out : callable
         Evaluate function
     """
-        
+    if not isinstance(arrays, np.ndarray):
+        raise ValueError("input must be numpy.ndarray")
+    
     if arrays.ndim not in [2, 3]:
         raise ValueError("array must be 2D or 3D")
 
-    if arrays.ndim > 3:
-        raise NotImplementedError("arrays must represent static images")
-
-    if isinstance(arrays, np.ndarray):
-        arrays = [arrays]
+    if arrays.ndim == 2:
+        arrays = arrays[np.newaxis,:,:]
 
     if delay < 0:
         raise ValueError("delay must be a postive number: ".format(delay))
